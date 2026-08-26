@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS & PALETTES
+═══════════════════════════════════════════════════════════ */
+:root {
+  /* ── Modern Curated Palette ── */
+  --brand-primary:      hsl(214, 100%, 62%);
+  --brand-primary-glow: hsla(214, 100%, 62%, 0.35);
+  --brand-secondary:    hsl(172, 85%,  50%);
+  --brand-accent:       hsl(265, 90%,  68%);
+
+  /* ── Background & Surfaces ── */
+  --color-bg:           #090d16;
+  --color-surface:      hsl(222, 28%, 12%);
+  --color-surface-2:    hsl(224, 25%, 16%);
+  --color-border:       hsla(220, 30%, 60%, 0.12);
+  --color-border-hover: hsla(214, 100%, 65%, 0.4);
+
+  /* ── Text Colors ── */
+  --color-text:         #f1f5f9;
+  --color-text-muted:   #94a3b8;
+  --color-text-dim:     #64748b;
+
+  /* ── Ultra-Glass System ── */
+  --glass-bg:           hsla(223, 30%, 14%, 0.65);
+  --glass-bg-hover:     hsla(223, 30%, 18%, 0.80);
+  --glass-border:       hsla(220, 40%, 75%, 0.12);
+  --glass-shadow:       0 12px 40px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px hsla(220, 40%, 80%, 0.06) inset;
+  --glass-blur:         20px;
+
+  /* ── Feedback States ── */
+  --color-success:      hsl(152, 68%, 46%);
+  --color-warning:      hsl(38,  94%, 54%);
+  --color-error:        hsl(356, 90%, 62%);
+  --color-info:         hsl(214, 95%, 62%);
+
+  /* ── Spacing Scale ── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ── Typography ── */
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  2rem;
+  --text-4xl:  2.75rem;
+  --text-5xl:  3.75rem;
+  --text-6xl:  5rem;
+
+  /* ── Radii ── */
+  --radius-sm:   0.5rem;
+  --radius-md:   0.875rem;
+  --radius-lg:   1.25rem;
+  --radius-xl:   1.75rem;
+  --radius-full: 9999px;
+
+  /* ── Transitions ── */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Dynamic Atmospheric Weather Gradients ── */
+  --grad-clear:    linear-gradient(145deg, #0c1c38 0%, #0d264f 40%, #091325 100%);
+  --grad-clouds:   linear-gradient(145deg, #111a2e 0%, #1a253a 50%, #0b1120 100%);
+  --grad-rain:     linear-gradient(145deg, #0f1c2e 0%, #152844 50%, #09121f 100%);
+  --grad-storm:    linear-gradient(145deg, #16122b 0%, #20183b 50%, #0c0919 100%);
+  --grad-snow:     linear-gradient(145deg, #122133 0%, #1a324b 50%, #0d1724 100%);
+  --grad-mist:     linear-gradient(145deg, #141d2b 0%, #1e2a3c 50%, #0c121c 100%);
+  --grad-default:  linear-gradient(145deg, #0b1120 0%, #111c33 50%, #080c16 100%);
+
+  /* Ambient Glow Colors */
+  --orb-clear:  hsla(214, 100%, 60%, 0.18);
+  --orb-clouds: hsla(220, 40%, 65%, 0.12);
+  --orb-rain:   hsla(195, 85%, 55%, 0.15);
+  --orb-storm:  hsla(270, 85%, 60%, 0.18);
+  --orb-snow:   hsla(190, 70%, 80%, 0.16);
+  --orb-mist:   hsla(210, 30%, 65%, 0.12);
+}

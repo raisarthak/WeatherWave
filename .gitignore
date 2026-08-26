@@ -1,0 +1,13 @@
+# Environment — NEVER commit this
+.env
+
+# Dependencies
+node_modules/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

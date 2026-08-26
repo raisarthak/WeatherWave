@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════════════════════
+   BASE — Typography, Reset & Ambient Canvas
+═══════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--grad-default);
+  background-attachment: fixed;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+  transition: background var(--transition-slow);
+}
+
+/* Dynamic background classes */
+body.weather-clear   { background: var(--grad-clear);   }
+body.weather-clouds  { background: var(--grad-clouds);  }
+body.weather-rain    { background: var(--grad-rain);    }
+body.weather-storm   { background: var(--grad-storm);   }
+body.weather-snow    { background: var(--grad-snow);    }
+body.weather-mist    { background: var(--grad-mist);    }
+body.weather-default { background: var(--grad-default); }
+
+/* Ambient atmospheric glow blobs */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(100px);
+  transition: all var(--transition-slow);
+}
+
+.glow-top-left {
+  top: -20vw;
+  right: -10vw;
+  width: clamp(350px, 50vw, 700px);
+  height: clamp(350px, 50vw, 700px);
+  background: var(--brand-primary-glow);
+  animation: orbFloat 14s ease-in-out infinite alternate;
+}
+
+.glow-bottom-right {
+  bottom: -20vw;
+  left: -10vw;
+  width: clamp(300px, 45vw, 600px);
+  height: clamp(300px, 45vw, 600px);
+  background: hsla(265, 90%, 65%, 0.12);
+  animation: orbFloat 18s ease-in-out infinite alternate-reverse;
+}
+
+/* Typography styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+button, input {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  border: none;
+  outline: none;
+  background: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--brand-secondary);
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Glass card styling */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: transform var(--transition-spring), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsla(220, 30%, 40%, 0.4);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(214, 100%, 62%, 0.6);
+}

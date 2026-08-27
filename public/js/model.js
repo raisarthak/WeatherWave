@@ -126,6 +126,49 @@ function parseForecast(json) {
 }
 
 /**
+ * @typedef {Object} HourlySlot
+ * @property {number} dt           - Unix timestamp
+ * @property {number} temp         - Temperature
+ * @property {number} feelsLike    - Feels-like temperature
+ * @property {number} humidity     - Humidity percentage
+ * @property {number} windSpeed    - Wind speed
+ * @property {number} windDeg      - Wind direction in degrees
+ * @property {number} clouds       - Cloud cover percentage
+ * @property {number} pop          - Probability of precipitation (0–1)
+ * @property {number} rain3h       - Rain volume for 3 hours (mm), may be 0
+ * @property {number} visibility   - Visibility in km
+ * @property {string} condition    - Weather condition main string
+ * @property {string} description  - Weather description
+ * @property {string} icon         - OWM icon code
+ */
+
+/**
+ * Parse OWM /forecast response into HourlySlot array (preserves 3-hour resolution).
+ * Used by the Decision Engine for activity scoring and best-time calculations.
+ * @param {object} json — raw forecast response
+ * @returns {HourlySlot[]}
+ */
+function parseHourlyForecast(json) {
+  if (!json || !json.list) return [];
+
+  return json.list.map(slot => ({
+    dt:          slot.dt,
+    temp:        Math.round(slot.main.temp),
+    feelsLike:   Math.round(slot.main.feels_like),
+    humidity:    slot.main.humidity,
+    windSpeed:   Math.round(slot.wind.speed * 10) / 10,
+    windDeg:     slot.wind.deg ?? 0,
+    clouds:      slot.clouds?.all ?? 0,
+    pop:         slot.pop ?? 0,
+    rain3h:      slot.rain?.['3h'] ?? 0,
+    visibility:  slot.visibility !== undefined ? Math.round(slot.visibility / 100) / 10 : 10,
+    condition:   slot.weather[0].main,
+    description: slot.weather[0].description,
+    icon:        slot.weather[0].icon,
+  }));
+}
+
+/**
  * @typedef {Object} AirQuality
  * @property {number} aqi           - 1 to 5
  * @property {string} label         - "Good", "Fair", "Moderate", "Poor", "Very Poor"

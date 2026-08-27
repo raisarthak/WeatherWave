@@ -116,13 +116,16 @@ const $unitF         = document.getElementById('unit-f');
 // ── Loading ───────────────────────────────────────────────────────────────────
 function setLoading(isLoading) {
   $loadingOverlay.classList.toggle('hidden', !isLoading);
+  if (isLoading && $weatherFx) {
+    $weatherFx.innerHTML = ''; // Immediately clear old particle effects on new search
+  }
 }
 
 // ── Error Toast ───────────────────────────────────────────────────────────────
 let toastTimer = null;
 
-function showError(message, icon = '⚠️') {
-  $toastIcon.textContent    = icon;
+function showError(message, iconHtml = null) {
+  $toastIcon.innerHTML      = iconHtml || Icons.alertTriangle(18);
   $toastMessage.textContent = message;
   $errorToast.classList.remove('hidden', 'toast-exit');
   void $errorToast.offsetWidth; // trigger reflow
@@ -150,40 +153,48 @@ function clearInputError() {
 }
 
 // ── Dynamic Background per Condition ──────────────────────────────────────────
-const CONDITION_MAP = {
-  'clear':        'weather-clear',
-  'clouds':       'weather-clouds',
-  'rain':         'weather-rain',
-  'drizzle':      'weather-rain',
-  'thunderstorm': 'weather-storm',
-  'snow':         'weather-snow',
-  'mist':         'weather-mist',
-  'smoke':        'weather-mist',
-  'haze':         'weather-mist',
-  'dust':         'weather-mist',
-  'fog':          'weather-mist',
-  'sand':         'weather-mist',
-  'ash':          'weather-mist',
-  'squall':       'weather-storm',
-  'tornado':      'weather-storm',
-};
+function normalizeCondition(condition) {
+  const c = (condition || '').toLowerCase().trim();
+  if (!c) return 'default';
+  if (c.includes('thunder') || c.includes('storm') || c.includes('tornado') || c.includes('squall') || c.includes('lightning')) return 'thunderstorm';
+  if (c.includes('rain') || c.includes('drizzle') || c.includes('shower') || c.includes('pour')) return 'rain';
+  if (c.includes('snow') || c.includes('sleet') || c.includes('blizzard') || c.includes('ice') || c.includes('hail')) return 'snow';
+  if (c.includes('cloud') || c.includes('overcast')) return 'clouds';
+  if (c.includes('mist') || c.includes('fog') || c.includes('haze') || c.includes('smoke') || c.includes('dust') || c.includes('sand') || c.includes('ash')) return 'mist';
+  if (c.includes('clear') || c.includes('sun')) return 'clear';
+  if (c.includes('wind') || c.includes('breeze') || c.includes('gale')) return 'wind';
+  return 'default';
+}
 
 function setBackground(condition) {
   const weatherClasses = ['weather-clear','weather-clouds','weather-rain','weather-storm','weather-snow','weather-mist','weather-default'];
   weatherClasses.forEach(c => $body.classList.remove(c));
-  const cls = CONDITION_MAP[(condition || '').toLowerCase()] || 'weather-default';
-  $body.classList.add(cls);
-  renderWeatherEffects(condition);
+  
+  const norm = normalizeCondition(condition);
+  const clsMap = {
+    'clear': 'weather-clear',
+    'clouds': 'weather-clouds',
+    'rain': 'weather-rain',
+    'thunderstorm': 'weather-storm',
+    'snow': 'weather-snow',
+    'mist': 'weather-mist',
+    'wind': 'weather-clouds',
+    'default': 'weather-default'
+  };
+  
+  $body.classList.add(clsMap[norm] || 'weather-default');
+  renderWeatherEffects(norm);
 }
 
 // ── Live Background Weather Animation Effects ─────────────────────────────────
 function renderWeatherEffects(condition) {
   if (!$weatherFx) return;
+  // Always clear previous animation elements first
   $weatherFx.innerHTML = '';
-  const cond = (condition || '').toLowerCase();
+  const norm = normalizeCondition(condition);
 
-  // 1. ☀️ Sunny / Clear -> Slow spinning glowing sun
-  if (cond === 'clear') {
+  // 1. Sunny / Clear -> Slow spinning glowing sun
+  if (norm === 'clear') {
     const sunContainer = document.createElement('div');
     sunContainer.className = 'fx-sun-container';
     sunContainer.innerHTML = `
@@ -193,8 +204,8 @@ function renderWeatherEffects(condition) {
     $weatherFx.appendChild(sunContainer);
   }
 
-  // 2. 🌧️ Rain / Drizzle -> Falling raindrops
-  else if (cond === 'rain' || cond === 'drizzle') {
+  // 2. Rain / Drizzle -> Falling raindrops
+  else if (norm === 'rain') {
     const rainContainer = document.createElement('div');
     rainContainer.className = 'fx-rain-container';
     const dropCount = 45;
@@ -211,8 +222,8 @@ function renderWeatherEffects(condition) {
     $weatherFx.appendChild(rainContainer);
   }
 
-  // 3. ☁️ Clouds -> Soft drifting cloud SVGs
-  else if (cond === 'clouds') {
+  // 3. Clouds -> Soft drifting cloud SVGs
+  else if (norm === 'clouds') {
     const cloudsContainer = document.createElement('div');
     cloudsContainer.className = 'fx-clouds-container';
     const cloudSvg = `
@@ -241,8 +252,8 @@ function renderWeatherEffects(condition) {
     $weatherFx.appendChild(cloudsContainer);
   }
 
-  // 4. ⚡ Thunderstorm -> Rain + Lightning Flash Screen
-  else if (cond === 'thunderstorm' || cond === 'squall' || cond === 'tornado') {
+  // 4. Thunderstorm -> Rain + Lightning Flash Screen
+  else if (norm === 'thunderstorm') {
     const thunderContainer = document.createElement('div');
     thunderContainer.className = 'fx-thunder-container';
     
@@ -267,15 +278,15 @@ function renderWeatherEffects(condition) {
     $weatherFx.appendChild(thunderContainer);
   }
 
-  // 5. ❄️ Snow -> Drifting gentle snowflakes
-  else if (cond === 'snow') {
+  // 5. Snow -> Drifting gentle snowflakes
+  else if (norm === 'snow') {
     const snowContainer = document.createElement('div');
     snowContainer.className = 'fx-snow-container';
-    const flakes = ['❄', '❅', '•'];
+    const flakeChars = ['*', '+', '·'];
     for (let i = 0; i < 35; i++) {
       const flake = document.createElement('div');
       flake.className = 'snowflake';
-      flake.textContent = flakes[Math.floor(Math.random() * flakes.length)];
+      flake.textContent = flakeChars[Math.floor(Math.random() * flakeChars.length)];
       flake.style.left = `${Math.random() * 100}%`;
       flake.style.animationDuration = `${4 + Math.random() * 6}s`;
       flake.style.animationDelay = `${Math.random() * 5}s`;
@@ -554,7 +565,7 @@ function renderSuggestions(items, activeIndex, onSelect) {
 
     const icon = document.createElement('span');
     icon.className = 'suggestion-icon';
-    icon.textContent = '📍';
+    icon.innerHTML = Icons.mapPin(14);
 
     const city = document.createElement('span');
     city.className = 'suggestion-city';

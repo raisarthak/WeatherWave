@@ -11,6 +11,9 @@ const state = {
   lastWeather: null,
   lastForecast: null,
   lastAqi: null,
+  lastForecastRaw: null,
+  lastHourlySlots: null,
+  selectedActivity: 'walk',
   userCoords: null, // { lat, lon } for proximity bias
 };
 
@@ -33,6 +36,8 @@ function goToHomeScreen() {
   state.lastWeather = null;
   state.lastForecast = null;
   state.lastAqi = null;
+  state.lastForecastRaw = null;
+  state.lastHourlySlots = null;
   $cityInput.value = '';
   hideSuggestions();
   showHomeScreen();
@@ -89,6 +94,8 @@ async function searchLocation(locationQuery) {
     state.lastLocation = queryParam;
     state.lastWeather  = weather;
     state.lastForecast = forecast;
+    state.lastForecastRaw = forecastRaw;
+    state.lastHourlySlots = parseHourlyForecast(forecastRaw);
 
     renderCurrentWeather(weather, state.unit);
     renderForecast(forecast, state.unit);
@@ -108,8 +115,12 @@ async function searchLocation(locationQuery) {
         const aqi    = parseAirQuality(aqiRaw);
         state.lastAqi = aqi;
         renderAirQuality(aqi);
+        // Render intelligence features with all data now available
+        renderAllIntelligence(weather, aqi, forecast, state.lastHourlySlots, state.selectedActivity, state.unit, handleActivitySelect, forecastRaw);
       } catch {
         renderAirQuality(null);
+        // Still render intelligence without AQI data
+        renderAllIntelligence(weather, null, forecast, state.lastHourlySlots, state.selectedActivity, state.unit, handleActivitySelect, forecastRaw);
       }
     }
 
@@ -148,10 +159,15 @@ async function searchByLocation() {
     state.lastWeather  = weather;
     state.lastForecast = forecast;
     state.lastAqi      = aqi;
+    state.lastForecastRaw = coordData.forecast;
+    state.lastHourlySlots = parseHourlyForecast(coordData.forecast);
 
     renderCurrentWeather(weather, state.unit);
     renderForecast(forecast, state.unit);
     renderAirQuality(aqi);
+
+    // Render intelligence features
+    renderAllIntelligence(weather, aqi, forecast, state.lastHourlySlots, state.selectedActivity, state.unit, handleActivitySelect, coordData.forecast);
 
     RecentSearches.add(recentLabel);
     renderRecentChips(RecentSearches.get(), handleChipSelect, handleChipRemove, handleClearAllRecents);
@@ -160,7 +176,7 @@ async function searchByLocation() {
 
   } catch (err) {
     if (err.name === 'AbortError') return;
-    showError(err.message || 'Location lookup failed.', '📍');
+    showError(err.message || 'Location lookup failed.', Icons.mapPin(18));
   } finally {
     setLoading(false);
   }
@@ -227,10 +243,15 @@ async function handleUnitToggle(newUnit) {
     ]);
     state.lastWeather  = parseCurrentWeather(weatherRaw);
     state.lastForecast = parseForecast(forecastRaw);
+    state.lastForecastRaw = forecastRaw;
+    state.lastHourlySlots = parseHourlyForecast(forecastRaw);
 
     renderCurrentWeather(state.lastWeather, state.unit);
     renderForecast(state.lastForecast, state.unit);
     if (state.lastAqi) renderAirQuality(state.lastAqi);
+
+    // Re-render intelligence with new unit
+    renderAllIntelligence(state.lastWeather, state.lastAqi, state.lastForecast, state.lastHourlySlots, state.selectedActivity, state.unit, handleActivitySelect, state.lastForecastRaw);
   } catch (err) {
     if (err.name !== 'AbortError') showError(err.message);
   } finally {
@@ -254,16 +275,33 @@ function handleClearAllRecents() {
   renderRecentChips([], handleChipSelect, handleChipRemove, handleClearAllRecents);
 }
 
+// ── Activity Selection Handler ────────────────────────────────────────────────
+function handleActivitySelect(activityKey) {
+  state.selectedActivity = activityKey;
+  if (state.lastWeather && state.lastHourlySlots) {
+    renderAllIntelligence(
+      state.lastWeather,
+      state.lastAqi,
+      state.lastForecast,
+      state.lastHourlySlots,
+      state.selectedActivity,
+      state.unit,
+      handleActivitySelect,
+      state.lastForecastRaw
+    );
+  }
+}
+
 // ── Error icon helper ─────────────────────────────────────────────────────────
 function errorIcon(code) {
   const map = {
-    CITY_NOT_FOUND: '🔍',
-    RATE_LIMIT:     '⏱️',
-    AUTH_ERROR:     '🔑',
-    NETWORK_ERROR:  '📡',
-    INVALID_COORDS: '📍',
+    CITY_NOT_FOUND: Icons.search(18),
+    RATE_LIMIT:     Icons.timer(18),
+    AUTH_ERROR:     Icons.key(18),
+    NETWORK_ERROR:  Icons.wifi(18),
+    INVALID_COORDS: Icons.mapPin(18),
   };
-  return map[code] || '⚠️';
+  return map[code] || Icons.alertTriangle(18);
 }
 
 // ── Event Listeners ───────────────────────────────────────────────────────────

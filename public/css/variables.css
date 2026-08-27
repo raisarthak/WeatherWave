@@ -20,12 +20,12 @@
   --color-text-muted:   #94a3b8;
   --color-text-dim:     #64748b;
 
-  /* ── Ultra-Glass System ── */
-  --glass-bg:           hsla(223, 30%, 14%, 0.65);
-  --glass-bg-hover:     hsla(223, 30%, 18%, 0.80);
-  --glass-border:       hsla(220, 40%, 75%, 0.12);
-  --glass-shadow:       0 12px 40px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px hsla(220, 40%, 80%, 0.06) inset;
-  --glass-blur:         20px;
+  /* ── Ultra-Glass System (Frosted backdrop-blur-md & bg-slate-900/30) ── */
+  --glass-bg:           rgba(15, 23, 42, 0.30);
+  --glass-bg-hover:     rgba(15, 23, 42, 0.45);
+  --glass-border:       rgba(255, 255, 255, 0.12);
+  --glass-shadow:       0 16px 40px -8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  --glass-blur:         16px;
 
   /* ── Feedback States ── */
   --color-success:      hsl(152, 68%, 46%);

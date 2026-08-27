@@ -2,16 +2,16 @@
    LAYOUT — Header, Main Containers & Responsive Grid
 ═══════════════════════════════════════════════════════════ */
 
-/* ── App Header ── */
+/* ── App Header (Transparent Overlay on Horizon) ── */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: var(--space-3) var(--space-6);
-  background: hsla(222, 30%, 8%, 0.72);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--glass-border);
+  padding: var(--space-4) var(--space-6);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .header-inner {

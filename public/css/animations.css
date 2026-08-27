@@ -80,13 +80,15 @@
   transition: opacity 0.6s ease;
 }
 
-/* ── ☀️ 1. SUNNY / CLEAR ANIMATION ── */
+/* ── 1. SUNNY / CLEAR ANIMATION ── */
 .fx-sun-container {
   position: absolute;
-  top: 5vh;
-  right: 8vw;
-  width: 280px;
-  height: 280px;
+  top: -40px;
+  right: 5%;
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,117 +98,130 @@
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
-  box-shadow: 0 0 60px rgba(255, 193, 7, 0.8), 0 0 120px rgba(255, 152, 0, 0.5);
+  background: radial-gradient(circle, #fde047 20%, #eab308 60%, rgba(234, 179, 8, 0) 100%);
+  box-shadow: 0 0 60px 20px rgba(253, 224, 71, 0.4);
   animation: sunGlowPulse 4s ease-in-out infinite alternate;
 }
 
 .fx-sun-rays {
   position: absolute;
-  width: 240px;
-  height: 240px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
-  border: 2px dashed rgba(255, 235, 59, 0.4);
-  box-shadow: 0 0 40px rgba(255, 235, 59, 0.3) inset;
-  animation: spin 32s linear infinite;
+  border: 2px dashed rgba(253, 224, 71, 0.35);
+  animation: sunRotate 28s linear infinite;
+}
+
+@keyframes sunRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @keyframes sunGlowPulse {
-  0%   { transform: scale(0.95); opacity: 0.85; filter: drop-shadow(0 0 40px rgba(255, 214, 0, 0.6)); }
-  100% { transform: scale(1.08); opacity: 1;    filter: drop-shadow(0 0 70px rgba(255, 160, 0, 0.85)); }
+  0%   { transform: scale(0.92); opacity: 0.8; }
+  100% { transform: scale(1.08); opacity: 1; }
 }
 
-/* ── 🌧️ 2. RAIN ANIMATION ── */
+/* ── 2. RAIN ANIMATION ── */
 .fx-rain-container {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .raindrop {
   position: absolute;
-  top: -100px;
+  top: -60px;
   width: 1.5px;
-  height: 35px;
-  background: linear-gradient(180deg, transparent, rgba(147, 197, 253, 0.75));
-  border-radius: var(--radius-full);
-  animation: rainDropFall linear infinite;
+  background: linear-gradient(to bottom, rgba(56, 189, 248, 0), rgba(56, 189, 248, 0.75));
+  animation: raindropFall linear infinite;
+  transform: rotate(-12deg);
 }
 
-@keyframes rainDropFall {
+@keyframes raindropFall {
   0% {
-    transform: translateY(-80px) translateX(0);
+    transform: translateY(0) rotate(-12deg);
     opacity: 0;
   }
-  20% {
-    opacity: 0.8;
+  15% {
+    opacity: 1;
   }
   90% {
-    opacity: 0.7;
+    opacity: 1;
   }
   100% {
-    transform: translateY(105vh) translateX(-25px);
-    opacity: 0.1;
+    transform: translateY(105vh) rotate(-12deg);
+    opacity: 0;
   }
 }
 
-/* ── ☁️ 3. CLOUDY DRIFT ANIMATION ── */
+/* ── 3. CLOUDY DRIFT ANIMATION ── */
 .fx-clouds-container {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .drifting-cloud {
   position: absolute;
-  opacity: 0.22;
-  filter: blur(1px);
+  left: -280px;
   animation: cloudDrift linear infinite;
+  filter: blur(4px);
 }
 
 @keyframes cloudDrift {
   0% {
-    transform: translateX(-350px);
+    transform: translateX(-300px);
   }
   100% {
-    transform: translateX(105vw);
+    transform: translateX(110vw);
   }
 }
 
-/* ── ⚡ 4. THUNDERSTORM / LIGHTNING ANIMATION ── */
+/* ── 4. THUNDERSTORM / LIGHTNING ANIMATION ── */
 .fx-thunder-container {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .lightning-flash-screen {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(224, 231, 255, 0.45) 0%, rgba(165, 180, 252, 0.25) 50%, transparent 80%);
+  background: rgba(255, 255, 255, 0.25);
   opacity: 0;
-  animation: lightningFlicker 6s infinite ease-in-out;
+  animation: lightningFlashes 6s ease-in-out infinite;
+  pointer-events: none;
 }
 
-@keyframes lightningFlicker {
-  0%, 88%, 92%, 96%, 100% {
+@keyframes lightningFlashes {
+  0%, 91%, 95%, 100% {
     opacity: 0;
   }
-  89% {
-    opacity: 0.7;
-  }
-  90% {
-    opacity: 0.15;
-  }
-  91% {
-    opacity: 0.95;
+  92% {
+    opacity: 0.6;
   }
   93% {
-    opacity: 0.2;
+    opacity: 0.1;
   }
-  95% {
+  94% {
     opacity: 0.8;
   }
 }
 
-/* ── ❄️ 5. SNOWFALL ANIMATION ── */
+/* ── 5. SNOWFALL ANIMATION ── */
 .fx-snow-container {
   position: absolute;
   inset: 0;

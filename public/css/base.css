@@ -41,7 +41,7 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/img/bg-image.png'), url('/img/bg-image.jpeg'), url('/bg-image.png'), url('/bg-image.jpeg');
+  background-image: url('../bg-image.jpeg'), url('../bg-image.png');
   background-size: cover;
   background-position: top center;
   background-repeat: no-repeat;

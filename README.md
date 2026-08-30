@@ -2,6 +2,15 @@
 
 > **A modern, responsive weather dashboard that makes real-time weather information simple, visual, and easy to understand.**
 
+**Live Demo:** [Weather Wave Live](https://raisarthak.github.io/WeatherWave-/)
+
+---
+
+## 🖥️ Live Demo
+
+### 🚀 Try Weather Wave
+👉 **[https://raisarthak.github.io/WeatherWave-/](https://raisarthak.github.io/WeatherWave-/)**
+
 ---
 
 
@@ -37,22 +46,21 @@ The project was built as a practical frontend development project with an emphas
 
 > Update these badges if your actual implementation uses a different stack.
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge\&logo=react\&logoColor=61DAFB)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge\&logo=javascript\&logoColor=000)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge\&logo=css3\&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge\&logo=vite\&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge\&logo=vercel\&logoColor=white)
+![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge\&logo=githubpages\&logoColor=white)
 
 ### Core Technologies
 
-| Technology      | Purpose                                 |
-| --------------- | --------------------------------------- |
-| **React**       | Building the interactive frontend       |
-| **JavaScript**  | Application logic and API interaction   |
-| **CSS**         | Styling and responsive layout           |
-| **Vite**        | Development server and production build |
-| **Weather API** | Fetching weather information            |
-| **Vercel**      | Production deployment                   |
+| Technology       | Purpose                                 |
+| ---------------- | --------------------------------------- |
+| **JavaScript**   | Application logic and API interaction   |
+| **CSS3**         | Styling, animations, and responsive UI  |
+| **Vite**         | Development server and production build |
+| **OpenWeather**  | Real-time weather and forecast data     |
+| **GitHub Pages** | Live production deployment              |
+
 
 ---
 
@@ -197,13 +205,13 @@ git --version
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/raisarthak/weather-wave.git
+git clone https://github.com/raisarthak/WeatherWave-.git
 ```
 
 ### 2. Navigate into the project
 
 ```bash
-cd weather-wave
+cd WeatherWave-
 ```
 
 ### 3. Install dependencies
@@ -285,26 +293,28 @@ npm run preview
 
 # ☁️ Deployment
 
-Weather Wave is deployed using **Vercel**.
+Weather Wave is deployed using **GitHub Pages** with automated **GitHub Actions CI/CD**.
+
+Live Demo: **[https://raisarthak.github.io/WeatherWave-/](https://raisarthak.github.io/WeatherWave-/)**
 
 Typical deployment workflow:
 
 ```text
-GitHub Repository
+GitHub Repository (main branch)
        │
        ▼
-   CI / CD
+ GitHub Actions
        │
        ▼
-   Build Project
+ Vite Build (dist/)
        │
        ▼
-Production Deployment
+GitHub Pages Deployment
+       │
+       ▼
+https://raisarthak.github.io/WeatherWave-/
 ```
 
-### Deployment Requirements
-
-Make sure production environment variables are configured in Vercel if the weather API requires an API key.
 
 ---
 

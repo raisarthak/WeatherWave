@@ -2,9 +2,8 @@
 
 > **A modern, responsive weather dashboard that makes real-time weather information simple, visual, and easy to understand.**
 
-**Live Demo:** [Weather Wave](https://weather-wave-raisarthak.vercel.app/)
-
 ---
+
 
 ## 📌 About The Project
 
@@ -33,13 +32,6 @@ The project was built as a practical frontend development project with an emphas
 
 ---
 
-## 🖥️ Live Demo
-
-### 🚀 Try Weather Wave
-
-👉 **https://weather-wave-raisarthak.vercel.app/**
-
----
 
 ## 🛠️ Tech Stack
 
@@ -301,16 +293,13 @@ Typical deployment workflow:
 GitHub Repository
        │
        ▼
-    Vercel
+   CI / CD
        │
        ▼
    Build Project
        │
        ▼
 Production Deployment
-       │
-       ▼
-weather-wave-raisarthak.vercel.app
 ```
 
 ### Deployment Requirements

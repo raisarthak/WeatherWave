@@ -2,14 +2,14 @@
 
 > **A modern, responsive weather dashboard that makes real-time weather information simple, visual, and easy to understand.**
 
-**Live Demo:** [Weather Wave Live](https://raisarthak.github.io/WeatherWave-/)
+**Live Demo:** [Weather Wave Live](https://raisarthak.github.io/WeatherWave/)
 
 ---
 
 ## 🖥️ Live Demo
 
 ### 🚀 Try Weather Wave
-👉 **[https://raisarthak.github.io/WeatherWave-/](https://raisarthak.github.io/WeatherWave-/)**
+👉 **[https://raisarthak.github.io/WeatherWave/](https://raisarthak.github.io/WeatherWave/)**
 
 ---
 
@@ -205,13 +205,13 @@ git --version
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/raisarthak/WeatherWave-.git
+git clone https://github.com/raisarthak/WeatherWave.git
 ```
 
 ### 2. Navigate into the project
 
 ```bash
-cd WeatherWave-
+cd WeatherWave
 ```
 
 ### 3. Install dependencies
@@ -295,7 +295,7 @@ npm run preview
 
 Weather Wave is deployed using **GitHub Pages** with automated **GitHub Actions CI/CD**.
 
-Live Demo: **[https://raisarthak.github.io/WeatherWave-/](https://raisarthak.github.io/WeatherWave-/)**
+Live Demo: **[https://raisarthak.github.io/WeatherWave/](https://raisarthak.github.io/WeatherWave/)**
 
 Typical deployment workflow:
 
@@ -312,7 +312,7 @@ GitHub Repository (main branch)
 GitHub Pages Deployment
        │
        ▼
-https://raisarthak.github.io/WeatherWave-/
+https://raisarthak.github.io/WeatherWave/
 ```
 
 

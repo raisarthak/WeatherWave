@@ -1,72 +1,89 @@
-# 🌦️ Weather Wave
+# 🌦️ WeatherWave
 
 > **A modern, responsive weather dashboard that makes real-time weather information simple, visual, and easy to understand.**
 
-**Live Demo:** [Weather Wave Live](https://raisarthak.github.io/WeatherWave/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-2ea44f?style=for-the-badge)](https://raisarthak.github.io/WeatherWave/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/raisarthak/WeatherWave)
+[![GitHub Pages](https://img.shields.io/badge/Deployed-GitHub%20Pages-222222?style=for-the-badge&logo=githubpages)](https://raisarthak.github.io/WeatherWave/)
 
 ---
 
-## 🖥️ Live Demo
+## 🚀 Live Demo
 
-### 🚀 Try Weather Wave
-👉 **[https://raisarthak.github.io/WeatherWave/](https://raisarthak.github.io/WeatherWave/)**
+### 🌐 Try WeatherWave
+
+👉 **[Open WeatherWave Live](https://raisarthak.github.io/WeatherWave/)**
 
 ---
-
 
 ## 📌 About The Project
 
-**Weather Wave** is a modern weather dashboard designed to provide users with a clean and intuitive way to explore weather conditions.
+**WeatherWave** is a modern and responsive weather dashboard designed to provide users with a clean and intuitive way to explore real-time weather information.
 
-Instead of presenting weather information as a collection of complicated numbers, the application focuses on a simple visual experience where users can search for locations and quickly understand important weather conditions.
+Instead of presenting weather information as a collection of complicated numbers, WeatherWave focuses on a simple and visual experience where users can search for locations and quickly understand important weather conditions.
 
-The project was built as a practical frontend development project with an emphasis on **responsive UI, API integration, reusable components, and a smooth user experience.**
+The project was built as a practical web development project with an emphasis on:
+
+- Responsive UI
+- Real-time API integration
+- Dynamic weather data
+- User-friendly interactions
+- Error handling
+- Clean and modern design
+- Fast performance
+- GitHub Pages deployment
 
 ---
 
 ## ✨ Features
 
-* 🌍 **Location-based weather search**
-* 🌡️ **Current temperature information**
-* ☁️ **Weather condition display**
-* 💧 **Humidity information**
-* 💨 **Wind information**
-* 📍 **Location-aware weather experience**
-* 📱 **Responsive design**
-* ⚡ **Fast and interactive interface**
-* 🎨 **Modern weather-focused UI**
-* 🔄 **Dynamic weather data**
-* ❌ **Error handling for invalid locations**
-* 🌐 **Deployed and accessible online**
+- 🌍 **Location-based weather search**
+- 🌡️ **Current temperature information**
+- ☁️ **Weather condition display**
+- 💧 **Humidity information**
+- 💨 **Wind speed information**
+- 📍 **Location-aware weather experience**
+- 📱 **Responsive design**
+- ⚡ **Fast and interactive interface**
+- 🎨 **Modern weather-focused UI**
+- 🔄 **Dynamic weather data**
+- ❌ **Error handling for invalid locations**
+- 🌐 **Live online deployment**
+- 🔍 **Location search and suggestions**
+- 🌤️ **Weather information based on searched location**
 
 ---
 
+# 🛠️ Tech Stack
 
-## 🛠️ Tech Stack
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 
-> Update these badges if your actual implementation uses a different stack.
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge\&logo=javascript\&logoColor=000)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge\&logo=css3\&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge\&logo=vite\&logoColor=white)
-![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge\&logo=githubpages\&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
-### Core Technologies
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
-| Technology       | Purpose                                 |
-| ---------------- | --------------------------------------- |
-| **JavaScript**   | Application logic and API interaction   |
-| **CSS3**         | Styling, animations, and responsive UI  |
-| **Vite**         | Development server and production build |
-| **OpenWeather**  | Real-time weather and forecast data     |
-| **GitHub Pages** | Live production deployment              |
-
+![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=githubpages&logoColor=white)
 
 ---
 
-## 🏗️ Application Architecture
+## 🔧 Core Technologies
 
-The application follows a simple client-side architecture:
+| Technology | Purpose |
+|------------|---------|
+| **HTML5** | Structure and semantic layout |
+| **CSS3** | Styling, animations, responsive design |
+| **JavaScript** | Application logic and API interaction |
+| **Vite** | Development server and production build |
+| **OpenWeather** | Real-time weather data |
+| **GitHub Pages** | Live production deployment |
+
+---
+
+# 🏗️ Application Architecture
+
+WeatherWave follows a client-side web application architecture where the frontend communicates with the weather API and dynamically updates the interface.
 
 ```text
                     ┌───────────────────┐
@@ -75,10 +92,11 @@ The application follows a simple client-side architecture:
                               │
                               ▼
                     ┌───────────────────┐
-                    │   React Frontend  │
+                    │   WeatherWave     │
+                    │     Frontend      │
                     │                   │
-                    │  Search / UI /    │
-                    │  Weather Cards    │
+                    │ Search / UI /     │
+                    │ Weather Details   │
                     └─────────┬─────────┘
                               │
                               ▼
@@ -96,7 +114,8 @@ The application follows a simple client-side architecture:
                               │
                               ▼
                     ┌───────────────────┐
-                    │ React State/Data  │
+                    │ JavaScript Logic  │
+                    │ & Data Processing │
                     └─────────┬─────────┘
                               │
                               ▼

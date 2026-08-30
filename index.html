@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WeatherWave — A modern, beautiful, real-time weather & air quality dashboard with intelligent activity scoring." />
+  <title>WeatherWave — Live Weather Intelligence & Decision Platform</title>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/intelligence.css" />
+</head>
+<body class="weather-default" id="app-body">
+
+  <!-- Full-Screen Fixed Background Container (top center alignment + dark gradient overlay) -->
+  <div class="fixed-bg-container" aria-hidden="true">
+    <div class="fixed-bg-image"></div>
+    <div class="fixed-bg-overlay"></div>
+  </div>
+
+  <!-- Atmospheric Dynamic Background Glows -->
+  <div class="ambient-glow glow-top-left" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom-right" aria-hidden="true"></div>
+
+  <!-- Live Weather Animation Effects Canvas -->
+  <div id="weather-fx" class="weather-fx" aria-hidden="true"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden" aria-live="polite" aria-label="Loading weather data">
+    <div class="spinner-box">
+      <div class="spinner-ring"></div>
+      <span class="spinner-icon" id="spinner-icon"></span>
+    </div>
+    <p class="loading-text">Fetching live weather data…</p>
+  </div>
+
+  <!-- Error Toast -->
+  <div id="error-toast" class="error-toast hidden" role="alert" aria-live="assertive">
+    <div id="toast-icon" class="toast-icon"></div>
+    <div class="toast-body">
+      <p class="toast-title">Notice</p>
+      <p id="toast-message" class="toast-message"></p>
+    </div>
+    <button id="toast-close" class="toast-close" aria-label="Dismiss error">✕</button>
+  </div>
+
+  <!-- Header & Navigation -->
+  <header class="app-header">
+    <div class="header-inner">
+      <!-- Brand Logo -->
+      <div class="header-brand" id="header-brand" role="button" tabindex="0" title="Go to home screen" aria-label="WeatherWave - Return to home screen">
+        <div class="brand-icon-wrapper" id="brand-icon"></div>
+        <div class="brand-text">
+          <span class="brand-name">WeatherWave</span>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-wrapper">
+        <form class="search-bar" id="search-form" onsubmit="return false;">
+          <span class="search-icon" id="search-icon-el" aria-hidden="true"></span>
+          <input
+            type="text"
+            id="city-input"
+            class="search-input"
+            placeholder="Search city, state or country…"
+            autocomplete="off"
+            aria-label="Enter city name"
+            maxlength="100"
+          />
+          <button type="button" id="geo-btn" class="geo-btn" aria-label="Use my current location" title="Use my current location">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </button>
+          <button type="submit" id="search-btn" class="search-btn" aria-label="Search weather">
+            <span>Search</span>
+          </button>
+        </form>
+        <!-- Location Suggestions Dropdown -->
+        <div id="search-suggestions" class="search-suggestions hidden" role="listbox" aria-label="Location suggestions"></div>
+        <p id="input-error" class="input-error hidden" role="alert">Please enter a valid city name.</p>
+      </div>
+
+      <!-- Temperature Unit Switcher -->
+      <div class="unit-toggle" role="group" aria-label="Temperature unit switcher">
+        <button type="button" id="unit-c" class="unit-btn active" aria-pressed="true" data-unit="metric">°C</button>
+        <button type="button" id="unit-f" class="unit-btn" aria-pressed="false" data-unit="imperial">°F</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="app-main" id="main-content">
+
+    <!-- ════════════════════════════════════════════════════════════
+         WELCOME / EMPTY STATE
+    ════════════════════════════════════════════════════════════ -->
+    <section id="empty-state" class="empty-state" aria-label="Welcome screen">
+      <div class="empty-content">
+        <h2 class="empty-title">Explore the weather anywhere in the world</h2>
+        <p class="empty-subtitle">Instant real-time meteorology, local air quality index, and precision 5-day forecasts.</p>
+      </div>
+
+      <div class="popular-cities-card glass-card">
+        <p class="popular-cities-label">Popular Locations</p>
+        <div class="quick-cities-grid">
+          <button type="button" class="quick-city-btn" data-city="London">
+            <span class="flag-icon" id="flag-gb"></span>
+            <span class="city-name">London</span>
+            <span class="country-tag">UK</span>
+          </button>
+          <button type="button" class="quick-city-btn" data-city="New York">
+            <span class="flag-icon" id="flag-us"></span>
+            <span class="city-name">New York</span>
+            <span class="country-tag">USA</span>
+          </button>
+          <button type="button" class="quick-city-btn" data-city="Tokyo">
+            <span class="flag-icon" id="flag-jp"></span>
+            <span class="city-name">Tokyo</span>
+            <span class="country-tag">JP</span>
+          </button>
+          <button type="button" class="quick-city-btn" data-city="Paris">
+            <span class="flag-icon" id="flag-fr"></span>
+            <span class="city-name">Paris</span>
+            <span class="country-tag">FR</span>
+          </button>
+          <button type="button" class="quick-city-btn" data-city="Dubai">
+            <span class="flag-icon" id="flag-ae"></span>
+            <span class="city-name">Dubai</span>
+            <span class="country-tag">UAE</span>
+          </button>
+          <button type="button" class="quick-city-btn" data-city="Gorakhpur">
+            <span class="flag-icon" id="flag-in"></span>
+            <span class="city-name">Gorakhpur</span>
+            <span class="country-tag">IN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feature Highlights -->
+      <div class="feature-pills">
+        <div class="feature-pill"><span class="feat-icon" id="feat-zap"></span> Sub-second live data</div>
+        <div class="feature-pill"><span class="feat-icon" id="feat-leaf"></span> Real-time AQI & Pollutants</div>
+        <div class="feature-pill"><span class="feat-icon" id="feat-cal"></span> 5-Day forecast outlook</div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         WEATHER DASHBOARD CONTENT
+    ════════════════════════════════════════════════════════════ -->
+    <div id="weather-content" class="weather-content hidden">
+
+      <!-- Hero Weather Card -->
+      <section class="hero-card glass-card" id="hero-card" aria-label="Current live weather">
+        <div class="hero-header-row">
+          <div class="hero-location-block">
+            <div class="hero-location">
+              <span class="location-pin-icon" id="hero-pin-icon"></span>
+              <h2 id="hero-city" class="hero-city">—</h2>
+              <span id="hero-country" class="hero-country"></span>
+            </div>
+            <div class="hero-meta-row">
+              <span id="hero-date" class="hero-date">—</span>
+              <span class="meta-dot">•</span>
+              <span id="hero-condition-badge" class="condition-badge">—</span>
+            </div>
+          </div>
+          <div id="hero-updated-time" class="hero-updated-time">Live Updated</div>
+        </div>
+
+        <div class="hero-main-row">
+          <div class="hero-temp-block">
+            <div class="hero-temp-row">
+              <span id="hero-temp" class="hero-temp">—</span>
+              <span id="hero-unit-label" class="hero-unit">°C</span>
+            </div>
+            <p id="hero-condition-desc" class="hero-condition-desc">—</p>
+            <p id="hero-feels-summary" class="hero-feels-summary">Feels like —</p>
+          </div>
+
+          <div class="hero-visual-block">
+            <div class="hero-icon-glow"></div>
+            <img id="hero-icon" class="hero-icon" src="" alt="Weather condition icon" />
+            <div class="temp-range-bar-wrapper">
+              <div class="temp-range-labels">
+                <span id="hero-low" class="temp-low-val">↓ —</span>
+                <span id="hero-high" class="temp-high-val">↑ —</span>
+              </div>
+              <div class="temp-range-track">
+                <div class="temp-range-fill" id="temp-range-fill"></div>
+                <div class="temp-range-marker" id="temp-range-marker"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Statistics Grid (7 rich metrics) -->
+      <section class="stats-section" aria-label="Detailed weather statistics">
+        <h3 class="section-title">Current Conditions & Metrics</h3>
+        <div class="stats-grid">
+          <!-- Feels Like -->
+          <article class="stat-card glass-card">
+            <div class="stat-top">
+              <span class="stat-label">Feels Like</span>
+              <span class="stat-icon" id="stat-icon-feels"></span>
+            </div>
+            <p class="stat-value" id="stat-feels-val">—</p>
+            <p class="stat-subtext" id="stat-feels-desc">Based on humidity & wind</p>
+          </article>
+
+          <!-- Humidity -->
+          <article class="stat-card glass-card">
+            <div class="stat-top">
+              <span class="stat-label">Humidity</span>
+              <span class="stat-icon" id="stat-icon-humidity"></span>
+            </div>
+            <p class="stat-value" id="stat-humidity-val">—</p>
+            <div class="stat-progress-bar">
+              <div class="stat-progress-fill" id="humidity-bar"></div>
+            </div>
+            <p class="stat-subtext" id="stat-humidity-desc">Relative moisture level</p>
+          </article>
+
+          <!-- Wind Speed & Direction -->
+          <article class="stat-card glass-card">
+            <div class="stat-top">
+              <span class="stat-label">Wind & Gusts</span>
+              <span class="stat-icon" id="stat-icon-wind"></span>
+            </div>
+            <div class="wind-val-row">
+              <span class="stat-value" id="stat-wind-val">—</span>
+              <span class="compass-arrow" id="compass-arrow">↑</span>
+            </div>
+            <p class="stat-subtext" id="stat-wind-desc">Direction & gust info</p>
+          </article>
+
+          <!-- Barometric Pressure -->
+          <article class="stat-card glass-card">
+            <div class="stat-top">
+              <span class="stat-label">Pressure</span>
+              <span class="stat-icon" id="stat-icon-pressure"></span>
+            </div>
+            <p class="stat-value" id="stat-pressure-val">—</p>
+            <p class="stat-subtext" id="stat-pressure-desc">Standard atmospheric</p>
+          </article>
+
+          <!-- Visibility -->
+          <article class="stat-card glass-card">
+            <div class="stat-top">
+              <span class="stat-label">Visibility</span>
+              <span class="stat-icon" id="stat-icon-vis"></span>
+            </div>
+            <p class="stat-value" id="stat-visibility-val">—</p>
+            <p class="stat-subtext" id="stat-visibility-desc">Distance clarity</p>
+          </article>
+
+          <!-- Cloud Cover -->
+          <article class="stat-card glass-card">
+            <div class="stat-top">
+              <span class="stat-label">Cloud Cover</span>
+              <span class="stat-icon" id="stat-icon-clouds"></span>
+            </div>
+            <p class="stat-value" id="stat-clouds-val">—</p>
+            <div class="stat-progress-bar">
+              <div class="stat-progress-fill" id="clouds-bar"></div>
+            </div>
+            <p class="stat-subtext" id="stat-clouds-desc">Sky coverage</p>
+          </article>
+
+          <!-- Sun & Daylight -->
+          <article class="stat-card glass-card stat-card-wide">
+            <div class="stat-top">
+              <span class="stat-label">Sunrise & Sunset</span>
+              <span class="stat-icon" id="stat-icon-sun"></span>
+            </div>
+            <div class="sun-times-row">
+              <div class="sun-col">
+                <span class="sun-sub">Sunrise</span>
+                <span class="sun-val" id="sun-rise-val">—</span>
+              </div>
+              <div class="sun-divider"></div>
+              <div class="sun-col">
+                <span class="sun-sub">Sunset</span>
+                <span class="sun-val" id="sun-set-val">—</span>
+              </div>
+            </div>
+            <p class="stat-subtext" id="sun-duration">Daylight cycle</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Air Quality Index (AQI) Card -->
+      <section class="aqi-section glass-card" id="aqi-section" aria-label="Air Quality Index">
+        <div class="aqi-header">
+          <div class="aqi-header-left">
+            <div class="aqi-icon-badge" id="aqi-icon-badge"></div>
+            <div>
+              <div class="aqi-title-row">
+                <h3 class="aqi-title">Air Quality Index (AQI)</h3>
+                <span class="aqi-live-dot"></span>
+              </div>
+              <p class="aqi-advisory" id="aqi-advisory">Live air quality reading</p>
+            </div>
+          </div>
+          <div class="aqi-badge aqi-good" id="aqi-badge">
+            <span class="aqi-number" id="aqi-number">1</span>
+            <span class="aqi-label" id="aqi-label">Good</span>
+          </div>
+        </div>
+
+        <!-- AQI Slider Section (Progress bar + Scale labels) -->
+        <div class="aqi-slider-section">
+          <div class="aqi-meter-track" id="aqi-meter-track">
+            <div class="aqi-meter-pointer" id="aqi-pointer"></div>
+            <div class="aqi-tooltip" id="aqi-tooltip">
+              <span class="aqi-tooltip-value" id="aqi-tooltip-value">0</span>
+              <span class="aqi-tooltip-label" id="aqi-tooltip-label">Good</span>
+            </div>
+          </div>
+          <div class="aqi-meter-labels">
+            <span>Good</span>
+            <span>Fair</span>
+            <span>Moderate</span>
+            <span>Poor</span>
+            <span>Hazardous</span>
+          </div>
+        </div>
+
+        <!-- Pollutant Breakdown Grid (6 Stat Cards) -->
+        <div class="aqi-pollutants-grid">
+          <div class="pollutant-item">
+            <div class="pollutant-top">
+              <span class="pollutant-name">PM<sub>2.5</sub></span>
+              <span class="pollutant-tag" title="Fine Particles">Fine Particles</span>
+            </div>
+            <span class="pollutant-val" id="pol-pm25">—</span>
+            <span class="pollutant-unit">μg/m³</span>
+          </div>
+          <div class="pollutant-item">
+            <div class="pollutant-top">
+              <span class="pollutant-name">PM<sub>10</sub></span>
+              <span class="pollutant-tag" title="Coarse Dust">Coarse Dust</span>
+            </div>
+            <span class="pollutant-val" id="pol-pm10">—</span>
+            <span class="pollutant-unit">μg/m³</span>
+          </div>
+          <div class="pollutant-item">
+            <div class="pollutant-top">
+              <span class="pollutant-name">O<sub>3</sub></span>
+              <span class="pollutant-tag" title="Ground Ozone">Ground Ozone</span>
+            </div>
+            <span class="pollutant-val" id="pol-o3">—</span>
+            <span class="pollutant-unit">μg/m³</span>
+          </div>
+          <div class="pollutant-item">
+            <div class="pollutant-top">
+              <span class="pollutant-name">NO<sub>2</sub></span>
+              <span class="pollutant-tag" title="Nitrogen Dioxide">Nitrogen Dioxide</span>
+            </div>
+            <span class="pollutant-val" id="pol-no2">—</span>
+            <span class="pollutant-unit">μg/m³</span>
+          </div>
+          <div class="pollutant-item">
+            <div class="pollutant-top">
+              <span class="pollutant-name">SO<sub>2</sub></span>
+              <span class="pollutant-tag" title="Sulfur Dioxide">Sulfur Dioxide</span>
+            </div>
+            <span class="pollutant-val" id="pol-so2">—</span>
+            <span class="pollutant-unit">μg/m³</span>
+          </div>
+          <div class="pollutant-item">
+            <div class="pollutant-top">
+              <span class="pollutant-name">CO</span>
+              <span class="pollutant-tag" title="Carbon Monoxide">Carbon Monoxide</span>
+            </div>
+            <span class="pollutant-val" id="pol-co">—</span>
+            <span class="pollutant-unit">μg/m³</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5-Day Forecast -->
+      <section class="forecast-section" aria-label="5-day forecast">
+        <div class="forecast-header">
+          <h3 class="section-title">5-Day Extended Forecast</h3>
+          <span class="forecast-subtitle">Daily temperature range & conditions</span>
+        </div>
+        <div class="forecast-strip" id="forecast-strip" role="list">
+          <!-- Rendered dynamically by UI script -->
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════
+           WEATHER INTELLIGENCE PLATFORM (All 5 Phases)
+      ════════════════════════════════════════════════════════════ -->
+
+      <!-- Phase 5: Natural Language Weather Assistant -->
+      <section class="intel-section hidden" id="weather-assistant" aria-label="Weather Intelligence Assistant">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-assistant"></div>
+          <div>
+            <h3 class="intel-section-title">Weather Intelligence Assistant</h3>
+            <p class="intel-section-subtitle">Ask questions about activities, forecasts, rain, or what to wear</p>
+          </div>
+        </div>
+        <div class="assistant-card">
+          <div class="assistant-prompt-chips">
+            <button type="button" class="assistant-chip" data-prompt="Should I carry an umbrella today?">Need an umbrella?</button>
+            <button type="button" class="assistant-chip" data-prompt="Can I go for a run today?">Good for running?</button>
+            <button type="button" class="assistant-chip" data-prompt="Is it suitable to play cricket?">Cricket conditions?</button>
+            <button type="button" class="assistant-chip" data-prompt="Is it a good day for drying laundry?">Drying clothes?</button>
+            <button type="button" class="assistant-chip" data-prompt="What should I wear today?">What to wear?</button>
+          </div>
+          <form class="assistant-form" id="assistant-form" onsubmit="return false;">
+            <input type="text" id="assistant-input" class="assistant-input" placeholder="Ask anything about the weather..." autocomplete="off" />
+            <button type="submit" class="assistant-send-btn" id="assistant-send-btn">Ask</button>
+          </form>
+          <div id="assistant-response"></div>
+        </div>
+      </section>
+
+      <!-- Phase 1: Decision Engine -->
+      <section class="intel-section hidden" id="decision-engine" aria-label="Weather Decision Engine">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-decision"></div>
+          <div>
+            <h3 class="intel-section-title">Weather Decision Engine</h3>
+            <p class="intel-section-subtitle">Multi-factor activity suitability calculations</p>
+          </div>
+        </div>
+        <div class="decision-engine-card">
+          <div class="activity-selector" id="activity-selector" role="group" aria-label="Select an activity">
+            <!-- Rendered dynamically -->
+          </div>
+          <div id="score-result" class="score-display">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 1: Best Time Today -->
+      <section class="intel-section hidden" id="best-time" aria-label="Best Time Today">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-besttime"></div>
+          <div>
+            <h3 class="intel-section-title">Best Time Today</h3>
+            <p class="intel-section-subtitle">Optimal hourly window for your selected activity</p>
+          </div>
+        </div>
+        <div class="best-time-card">
+          <div id="best-time-result" class="best-time-result"></div>
+          <div id="best-time-timeline"></div>
+        </div>
+      </section>
+
+      <!-- Phase 1: Weather Impact -->
+      <section class="intel-section hidden" id="weather-impact" aria-label="Weather Impact on Activities">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-impact"></div>
+          <div>
+            <h3 class="intel-section-title">Activity Weather Impact</h3>
+            <p class="intel-section-subtitle">Suitability matrix across all 10 activities</p>
+          </div>
+        </div>
+        <div class="impact-grid" id="impact-grid"></div>
+      </section>
+
+      <!-- Phase 3: Commute / Weather Journey -->
+      <section class="intel-section hidden" id="journey-weather" aria-label="Commute and Journey Weather">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-journey"></div>
+          <div>
+            <h3 class="intel-section-title">Commute & Journey Weather</h3>
+            <p class="intel-section-subtitle">Compare departure vs destination conditions</p>
+          </div>
+        </div>
+        <div class="journey-card">
+          <form class="journey-search-form" id="journey-form" onsubmit="return false;">
+            <input type="text" id="journey-origin" class="journey-input" placeholder="Origin city..." />
+            <input type="text" id="journey-dest" class="journey-input" placeholder="Destination city..." />
+            <button type="submit" class="journey-btn">Compare Route</button>
+          </form>
+          <div id="journey-comparison-box"></div>
+        </div>
+      </section>
+
+      <!-- Phase 3: Detailed Laundry Analyzer -->
+      <section class="intel-section hidden" id="laundry-analyzer" aria-label="Laundry Drying Analyzer">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-laundry"></div>
+          <div>
+            <h3 class="intel-section-title">Outdoor Laundry Drying Analyzer</h3>
+            <p class="intel-section-subtitle">Thermal, humidity, and wind drying physics</p>
+          </div>
+        </div>
+        <div class="laundry-card" id="laundry-content"></div>
+      </section>
+
+      <!-- Phase 4: Weather Personality -->
+      <section class="intel-section hidden" id="weather-personality" aria-label="Today's Weather Personality">
+        <div class="personality-card" id="personality-content"></div>
+      </section>
+
+      <!-- Phase 2: Forecast Confidence -->
+      <section class="intel-section hidden" id="forecast-confidence" aria-label="Forecast Confidence">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-confidence"></div>
+          <div>
+            <h3 class="intel-section-title">Forecast Confidence</h3>
+            <p class="intel-section-subtitle">Reliability scoring per forecast day</p>
+          </div>
+        </div>
+        <div class="confidence-grid" id="confidence-grid"></div>
+      </section>
+
+      <!-- Phase 2: Weather Changes (only shown when changes detected) -->
+      <section class="intel-section hidden" id="weather-changes" aria-label="Upcoming Weather Changes">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-changes"></div>
+          <div>
+            <h3 class="intel-section-title">Upcoming Changes</h3>
+            <p class="intel-section-subtitle">Notable meteorological shifts in the next hours</p>
+          </div>
+        </div>
+        <div class="changes-list" id="changes-list"></div>
+      </section>
+
+      <!-- Phase 2: Storm Arrival (only shown when storm approaching) -->
+      <section class="intel-section hidden" id="storm-arrival" aria-label="Storm Arrival Warning">
+        <div class="storm-alert-card" id="storm-alert-content"></div>
+      </section>
+
+      <!-- Phase 4: Weather History & Accuracy Tracking -->
+      <section class="intel-section hidden" id="weather-history" aria-label="Weather History & Accuracy">
+        <div class="intel-section-header">
+          <div class="intel-section-icon" id="intel-icon-history"></div>
+          <div>
+            <h3 class="intel-section-title">Weather History & Model Accuracy</h3>
+            <p class="intel-section-subtitle">Historical trend tracking and verification score</p>
+          </div>
+        </div>
+        <div class="history-card">
+          <div id="history-accuracy-content"></div>
+          <div class="history-chart-wrapper" id="history-chart-wrapper"></div>
+        </div>
+      </section>
+
+      <!-- Recent Searches -->
+      <section class="recent-section" id="recent-section" aria-label="Recent searches">
+        <div class="recent-header">
+          <h3 class="section-title">Recent Searches</h3>
+          <button type="button" id="clear-recents-btn" class="clear-recents-btn" aria-label="Clear all recent searches">Clear History</button>
+        </div>
+        <div class="chip-bar" id="chip-bar" role="list">
+          <!-- Rendered dynamically by UI script -->
+        </div>
+      </section>
+
+    </div><!-- /weather-content -->
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p class="footer-brand-title">WeatherWave</p>
+      <p class="footer-copy">Powered by <a href="https://openweathermap.org" target="_blank" rel="noopener">OpenWeatherMap API</a> &amp; Air Pollution Services.</p>
+    </div>
+  </footer>
+
+  <!-- JS Modules in dependency order -->
+  <script src="js/icons.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/geolocation.js"></script>
+  <script src="js/decision-engine.js"></script>
+  <script src="js/travel-utility.js"></script>
+  <script src="js/personalization.js"></script>
+  <script src="js/assistant.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/ui-intelligence.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Initialize SVG icons on static elements after DOM loads -->
+  <script>
+    (function initIcons() {
+      const brandEl = document.getElementById('brand-icon');
+      if (brandEl) brandEl.innerHTML = Icons.cloudSun(22);
+
+      const searchIconEl = document.getElementById('search-icon-el');
+      if (searchIconEl) searchIconEl.innerHTML = Icons.search(16);
+
+      const spinnerEl = document.getElementById('spinner-icon');
+      if (spinnerEl) spinnerEl.innerHTML = Icons.cloudSun(28);
+
+      const pinEl = document.getElementById('hero-pin-icon');
+      if (pinEl) pinEl.innerHTML = Icons.mapPin(16);
+
+      const statIcons = {
+        'stat-icon-feels': 'thermometer',
+        'stat-icon-humidity': 'droplets',
+        'stat-icon-wind': 'wind',
+        'stat-icon-pressure': 'gauge',
+        'stat-icon-vis': 'eye',
+        'stat-icon-clouds': 'cloud',
+        'stat-icon-sun': 'sunrise',
+      };
+      Object.entries(statIcons).forEach(([id, icon]) => {
+        const el = document.getElementById(id);
+        if (el && Icons[icon]) el.innerHTML = Icons[icon](18);
+      });
+
+      const aqiIconEl = document.getElementById('aqi-icon-badge');
+      if (aqiIconEl) aqiIconEl.innerHTML = Icons.leaf(20);
+
+      const featIcons = { 'feat-zap': 'zap', 'feat-leaf': 'leaf', 'feat-cal': 'calendar' };
+      Object.entries(featIcons).forEach(([id, icon]) => {
+        const el = document.getElementById(id);
+        if (el && Icons[icon]) el.innerHTML = Icons[icon](16);
+      });
+
+      document.querySelectorAll('.flag-icon').forEach(el => {
+        el.innerHTML = Icons.globe(16);
+      });
+
+      const intelIcons = {
+        'intel-icon-assistant': 'sparkles',
+        'intel-icon-decision': 'activity',
+        'intel-icon-besttime': 'clock',
+        'intel-icon-impact': 'barChart',
+        'intel-icon-confidence': 'shieldCheck',
+        'intel-icon-changes': 'trendingUp',
+        'intel-icon-journey': 'route',
+        'intel-icon-laundry': 'shirt',
+        'intel-icon-history': 'history',
+      };
+      Object.entries(intelIcons).forEach(([id, icon]) => {
+        const el = document.getElementById(id);
+        if (el && Icons[icon]) el.innerHTML = Icons[icon](22);
+      });
+    })();
+  </script>
+</body>
+</html>

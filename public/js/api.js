@@ -1,7 +1,18 @@
 /**
- * api.js — All HTTP calls go to /api/* (our Express proxy).
- * The OWM API key never appears here — it lives server-side.
+ * api.js — Hybrid API Client for WeatherWave.
+ * 
+ * 1. Automatically uses Express proxy (/api/*) when running locally or on server environments.
+ * 2. Automatically falls back to direct OpenWeatherMap API calls on static hosting (e.g. GitHub Pages).
  */
+
+const DIRECT_OWM_KEY = 'dbd274e15fc7845da1ff9072927f0244';
+const OWM_BASE = 'https://api.openweathermap.org/data/2.5';
+const OWM_GEO = 'https://api.openweathermap.org/geo/1.0';
+
+let isStaticMode = typeof window !== 'undefined' && (
+  window.location.hostname.includes('github.io') ||
+  window.location.protocol === 'file:'
+);
 
 let searchController = null;
 let suggestController = null;
@@ -30,7 +41,7 @@ function createSuggestSignal() {
 }
 
 /**
- * Core fetch wrapper.
+ * Core fetch wrapper with automatic static fallback.
  * @param {string} url
  * @param {AbortSignal} [signal]
  * @returns {Promise<any>}
@@ -44,17 +55,21 @@ async function apiFetch(url, signal = null) {
   }
 
   const response = await fetch(url, fetchOptions);
-  const json = await response.json();
-
+  
   if (!response.ok) {
-    // Server returned a structured error — propagate it
-    const err = new Error(json.message || 'Request failed');
+    let json = {};
+    try {
+      json = await response.json();
+    } catch {
+      // Non-JSON response (e.g. 404 HTML page)
+    }
+    const err = new Error(json.message || `Request failed with status ${response.status}`);
     err.code = json.code || 'UNKNOWN';
     err.status = response.status;
     throw err;
   }
 
-  return json;
+  return response.json();
 }
 
 /**
@@ -65,11 +80,24 @@ async function apiFetch(url, signal = null) {
  * @param {AbortSignal} [signal]
  */
 async function fetchSuggestions(query, userLat = null, userLon = null, signal = null) {
-  let url = `/api/geocode/suggest?q=${encodeURIComponent(query)}`;
-  if (userLat !== null && userLon !== null) {
-    url += `&lat=${userLat}&lon=${userLon}`;
+  if (isStaticMode) {
+    const geoUrl = `${OWM_GEO}/direct?q=${encodeURIComponent(query)}&limit=5&appid=${DIRECT_OWM_KEY}`;
+    return apiFetch(geoUrl, signal);
   }
-  return apiFetch(url, signal);
+
+  try {
+    let url = `/api/geocode/suggest?q=${encodeURIComponent(query)}`;
+    if (userLat !== null && userLon !== null) {
+      url += `&lat=${userLat}&lon=${userLon}`;
+    }
+    return await apiFetch(url, signal);
+  } catch (err) {
+    if (err.status === 404) {
+      isStaticMode = true;
+      return fetchSuggestions(query, userLat, userLon, signal);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -79,6 +107,17 @@ async function fetchSuggestions(query, userLat = null, userLon = null, signal = 
  * @param {AbortSignal} [signal]
  */
 async function fetchWeather(location, unit = 'metric', signal = null) {
+  if (isStaticMode) {
+    let directUrl;
+    if (typeof location === 'object' && location !== null && location.lat !== undefined && location.lon !== undefined) {
+      directUrl = `${OWM_BASE}/weather?lat=${location.lat}&lon=${location.lon}&units=${unit}&appid=${DIRECT_OWM_KEY}`;
+    } else {
+      const q = typeof location === 'object' ? (location.city || location.name) : location;
+      directUrl = `${OWM_BASE}/weather?q=${encodeURIComponent(q)}&units=${unit}&appid=${DIRECT_OWM_KEY}`;
+    }
+    return apiFetch(directUrl, signal);
+  }
+
   let url;
   if (typeof location === 'object' && location !== null) {
     const params = new URLSearchParams({ unit });
@@ -92,7 +131,16 @@ async function fetchWeather(location, unit = 'metric', signal = null) {
   } else {
     url = `/api/weather?city=${encodeURIComponent(location)}&unit=${unit}`;
   }
-  return apiFetch(url, signal);
+
+  try {
+    return await apiFetch(url, signal);
+  } catch (err) {
+    if (err.status === 404) {
+      isStaticMode = true;
+      return fetchWeather(location, unit, signal);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -102,6 +150,17 @@ async function fetchWeather(location, unit = 'metric', signal = null) {
  * @param {AbortSignal} [signal]
  */
 async function fetchForecast(location, unit = 'metric', signal = null) {
+  if (isStaticMode) {
+    let directUrl;
+    if (typeof location === 'object' && location !== null && location.lat !== undefined && location.lon !== undefined) {
+      directUrl = `${OWM_BASE}/forecast?lat=${location.lat}&lon=${location.lon}&units=${unit}&appid=${DIRECT_OWM_KEY}`;
+    } else {
+      const q = typeof location === 'object' ? (location.city || location.name) : location;
+      directUrl = `${OWM_BASE}/forecast?q=${encodeURIComponent(q)}&units=${unit}&appid=${DIRECT_OWM_KEY}`;
+    }
+    return apiFetch(directUrl, signal);
+  }
+
   let url;
   if (typeof location === 'object' && location !== null) {
     const params = new URLSearchParams({ unit });
@@ -115,7 +174,16 @@ async function fetchForecast(location, unit = 'metric', signal = null) {
   } else {
     url = `/api/forecast?city=${encodeURIComponent(location)}&unit=${unit}`;
   }
-  return apiFetch(url, signal);
+
+  try {
+    return await apiFetch(url, signal);
+  } catch (err) {
+    if (err.status === 404) {
+      isStaticMode = true;
+      return fetchForecast(location, unit, signal);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -126,8 +194,24 @@ async function fetchForecast(location, unit = 'metric', signal = null) {
  * @param {AbortSignal} [signal]
  */
 async function fetchByCoords(lat, lon, unit = 'metric', signal = null) {
+  if (isStaticMode) {
+    const [current, forecast] = await Promise.all([
+      fetchWeather({ lat, lon }, unit, signal),
+      fetchForecast({ lat, lon }, unit, signal),
+    ]);
+    return { current, forecast };
+  }
+
   const url = `/api/coords?lat=${lat}&lon=${lon}&unit=${unit}`;
-  return apiFetch(url, signal);
+  try {
+    return await apiFetch(url, signal);
+  } catch (err) {
+    if (err.status === 404) {
+      isStaticMode = true;
+      return fetchByCoords(lat, lon, unit, signal);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -137,6 +221,19 @@ async function fetchByCoords(lat, lon, unit = 'metric', signal = null) {
  * @param {AbortSignal} [signal]
  */
 async function fetchAirPollution(lat, lon, signal = null) {
+  if (isStaticMode) {
+    const directUrl = `${OWM_BASE}/air_pollution?lat=${lat}&lon=${lon}&appid=${DIRECT_OWM_KEY}`;
+    return apiFetch(directUrl, signal);
+  }
+
   const url = `/api/air-pollution?lat=${lat}&lon=${lon}`;
-  return apiFetch(url, signal);
+  try {
+    return await apiFetch(url, signal);
+  } catch (err) {
+    if (err.status === 404) {
+      isStaticMode = true;
+      return fetchAirPollution(lat, lon, signal);
+    }
+    throw err;
+  }
 }
